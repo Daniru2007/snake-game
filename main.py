@@ -90,6 +90,7 @@ while run:
 
     snake.move(food)
 
+    screen.fill(255, 255, 255)
     food.display(screen)
     snake.display(screen)
 
