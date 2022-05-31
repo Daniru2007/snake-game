@@ -40,12 +40,17 @@ class Snake(object):
             self.y -= self.height
         if self.direction == Directions.DOWN:
             self.y += self.height
+
+        for obj in self.snake_objs:
+            if obj.colliderect(pygame.Rect(self.x, self.y, self.width, self.height)):
+                return True
         self.snake_objs.insert(0, pygame.Rect(self.x, self.y, self.width, self.height))
         if food.rect().colliderect(pygame.Rect(self.x, self.y, self.width, self.height)):
             food.change_pos()
             self.score += 1
         else:
             self.snake_objs.pop(-1)
+        False
 
     def display(self, screen):
         for obj in self.snake_objs:
@@ -56,8 +61,8 @@ class Food(object):
     def __init__(self, width, height):
         self.x = random.randint(0, 600)
         self.y = random.randint(0, 400)
-        self.width = 10
-        self.height = 10
+        self.width = width
+        self.height = height
 
     def change_pos(self):
         self.x = random.randint(0, 600)
@@ -70,8 +75,8 @@ class Food(object):
         pygame.draw.rect(screen, (255, 0, 0), (self.x, self.y, self.width, self.height))
 
 
-snake = Snake(10, 10, 10, 10)
-food = Food(10, 10)
+snake = Snake(10, 10, 20, 20)
+food = Food(20, 20)
 run = True
 while run:
     for event in pygame.event.get():
@@ -88,7 +93,8 @@ while run:
             if event.key == pygame.K_DOWN:
                 snake.direction = Directions.DOWN
 
-    snake.move(food)
+    if snake.move(food):
+        run = False
 
     screen.fill((0, 0, 0))
     food.display(screen)
