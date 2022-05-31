@@ -7,7 +7,7 @@ pygame.init()
 screen = pygame.display.set_mode(WINDOW_SIZE)
 pygame.display.set_caption("snake game")
 clock = pygame.time.Clock()
-FPS = 20
+FPS = 10
 
 
 class Directions(Enum):
@@ -29,7 +29,7 @@ class Snake(object):
             pygame.Rect(self.x, self.y, self.width, self.height),
             pygame.Rect(self.x-self.width, self.y, self.width, self.height),
             pygame.Rect(self.x-2*self.width, self.y, self.width, self.height)
-            ]
+        ]
 
     def move(self, food):
         if self.direction == Directions.RIGHT:
@@ -44,7 +44,10 @@ class Snake(object):
         for obj in self.snake_objs:
             if obj.colliderect(pygame.Rect(self.x, self.y, self.width, self.height)):
                 return True
-        self.snake_objs.insert(0, pygame.Rect(self.x, self.y, self.width, self.height))
+        if self.x < 0 or self.x > WINDOW_SIZE[0] or self.y < 0 or self.y > WINDOW_SIZE[1]:
+            return True
+        self.snake_objs.insert(0, pygame.Rect(
+            self.x, self.y, self.width, self.height))
         if food.rect().colliderect(pygame.Rect(self.x, self.y, self.width, self.height)):
             food.change_pos()
             self.score += 1
@@ -54,13 +57,14 @@ class Snake(object):
 
     def display(self, screen):
         for obj in self.snake_objs:
-            pygame.draw.rect(screen, (255, 255, 255), (obj.x, obj.y, self.width, self.height))
+            pygame.draw.rect(screen, (255, 255, 255),
+                             (obj.x, obj.y, self.width, self.height))
 
 
 class Food(object):
     def __init__(self, width, height):
-        self.x = random.randint(0, 600)
-        self.y = random.randint(0, 400)
+        self.x = random.randint(width, 600-width)
+        self.y = random.randint(height, 400-height)
         self.width = width
         self.height = height
 
@@ -72,11 +76,13 @@ class Food(object):
         return pygame.Rect(self.x, self.y, self.width, self.height)
 
     def display(self, screen):
-        pygame.draw.rect(screen, (255, 0, 0), (self.x, self.y, self.width, self.height))
+        pygame.draw.rect(screen, (255, 0, 0),
+                         (self.x, self.y, self.width, self.height))
 
 
 snake = Snake(10, 10, 20, 20)
 food = Food(20, 20)
+font = pygame.font.Font("fonts/B04.ttf", 18)
 run = True
 while run:
     for event in pygame.event.get():
@@ -96,9 +102,12 @@ while run:
     if snake.move(food):
         run = False
 
+    score = font.render(f"score: {snake.score}", True, (255, 255, 255))
+
     screen.fill((0, 0, 0))
     food.display(screen)
     snake.display(screen)
+    screen.blit(score, (20, 20))
 
     clock.tick(FPS)
     pygame.display.update()
