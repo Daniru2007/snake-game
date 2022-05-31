@@ -7,7 +7,7 @@ pygame.init()
 screen = pygame.display.set_mode(WINDOW_SIZE)
 pygame.display.set_caption("snake game")
 clock = pygame.time.Clock()
-FPS = 40
+FPS = 20
 
 
 class Directions(Enum):
@@ -90,7 +90,7 @@ while run:
 
     snake.move(food)
 
-    screen.fill(255, 255, 255)
+    screen.fill((0, 0, 0))
     food.display(screen)
     snake.display(screen)
 
